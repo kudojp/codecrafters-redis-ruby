@@ -1,6 +1,13 @@
 require "socket"
-class YourRedisServer
+require "./app/server/command_line_executor"
+require "./app/resp/command_line"
+require "./app/resp/parser.rb"
+
+Thread.abort_on_exception=true # for the debugging purpose.
+
+class Server
   MAX_COMMAND_LENGTH = 1024
+
   def initialize(port)
     @port = port
   end
@@ -15,28 +22,26 @@ class YourRedisServer
     end
   end
 
+  private
+
   def handle_connection(socket)
     Thread.new do
-      puts "handling socket #{socket.object_id} in thread #{Thread.current.object_id}"
+      puts "Handling the socket #{socket.object_id} in thread #{Thread.current.object_id}"
 
       loop do
         begin
-          socket.recv(MAX_COMMAND_LENGTH)
-        rescue Errno::ECONNRESET
-          puts "The connection is probably terminated by the client."
-          break
+          resp_command_line = socket.recv(MAX_COMMAND_LENGTH)
+          break if resp_command_line == "" # probably client program has exited.
         end
-        
-        begin
-          socket.write("+PONG\r\n")
-        rescue Errno::ECONNRESET, Errno::EPIPE
-          puts "The connection is terminated by the client."
-          break
+
+        RESP::Parser.new(resp_command_line).parse.each do |command_line|
+          CommandLineExecutor.new(command_line, socket).execute!
         end
       end
-      # socket.close
+      puts "Close the socket #{socket.object_id} in thread #{Thread.current.object_id}"
+      socket.close
     end
   end
 end
 
-YourRedisServer.new(6379).start
+Server.new(6379).start
