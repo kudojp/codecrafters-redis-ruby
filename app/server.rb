@@ -30,11 +30,9 @@ class Server
       puts "Handling the socket #{socket.object_id} in thread #{Thread.current.object_id}"
 
       loop do
-        begin
-          # TODO: Server has to close the connection after keep-alive period ends
-          resp_command_line = socket.recv(MAX_COMMAND_LENGTH)
-          break if resp_command_line == ""
-        end
+        # TODO: Server has to close the connection after keep-alive period ends
+        resp_command_line = socket.recv(MAX_COMMAND_LENGTH)
+        break if resp_command_line == ""
 
         command_line = RESP::Parser.new(resp_command_line).parse
         CommandLineExecutor.new(command_line, socket, @key_values).execute!
