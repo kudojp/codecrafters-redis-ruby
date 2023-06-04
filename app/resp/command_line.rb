@@ -6,6 +6,8 @@ module RESP
     COMMANDS = [
       :echo,
       :ping,
+      :set,
+      :get,
     ]
 
     attr_reader :command

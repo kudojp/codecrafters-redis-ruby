@@ -17,7 +17,6 @@ module RESP
       command_lines = []
       # Current logic assumes that there is only one command in one command line. (*1)
       tokens = @resp_str.split("\r\n")
-
       cl_command = tokens[2].to_sym
       cl_args = []
 

@@ -10,6 +10,7 @@ class Server
 
   def initialize(port)
     @port = port
+    @key_values = {}
   end
 
   def start
@@ -30,16 +31,18 @@ class Server
 
       loop do
         begin
+           # TODO: Server has to close the connection after keep-alive period ends
           resp_command_line = socket.recv(MAX_COMMAND_LENGTH)
-          break if resp_command_line == "" # probably client program has exited.
+          break if resp_command_line == ""
         end
 
         RESP::Parser.new(resp_command_line).parse.each do |command_line|
-          CommandLineExecutor.new(command_line, socket).execute!
+          CommandLineExecutor.new(command_line, socket, @key_values).execute!
         end
       end
-      puts "Close the socket #{socket.object_id} in thread #{Thread.current.object_id}"
+
       socket.close
+      puts "Socket #{socket.object_id} closed in thread #{Thread.current.object_id}"
     end
   end
 end
