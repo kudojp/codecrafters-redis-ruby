@@ -31,14 +31,13 @@ class Server
 
       loop do
         begin
-           # TODO: Server has to close the connection after keep-alive period ends
+          # TODO: Server has to close the connection after keep-alive period ends
           resp_command_line = socket.recv(MAX_COMMAND_LENGTH)
           break if resp_command_line == ""
         end
 
-        RESP::Parser.new(resp_command_line).parse.each do |command_line|
-          CommandLineExecutor.new(command_line, socket, @key_values).execute!
-        end
+        command_line = RESP::Parser.new(resp_command_line).parse
+        CommandLineExecutor.new(command_line, socket, @key_values).execute!
       end
 
       socket.close

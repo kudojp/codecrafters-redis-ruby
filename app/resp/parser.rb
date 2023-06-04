@@ -14,7 +14,6 @@ module RESP
     end
 
     def parse
-      command_lines = []
       # Current logic assumes that there is only one command in one command line. (*1)
       tokens = @resp_str.split("\r\n")
       cl_command = tokens[2].to_sym
@@ -30,8 +29,7 @@ module RESP
         curr_idx += 1
       end
 
-      command_lines << CommandLine.new(cl_command, cl_args)
-      command_lines
+      CommandLine.new(cl_command, cl_args)
     end
   end
 end
