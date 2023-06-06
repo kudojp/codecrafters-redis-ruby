@@ -6,9 +6,9 @@ class CommandLineBuilder
   # ref. https://redis.io/docs/reference/protocol-spec/
   TOKEN_TYPE_COVERTERS = {
     # For Simple Strings, the first byte of the reply is "+"
-    ":" => lambda{|arg_str| arg_str.to_i},
+    ":" => lambda{|_length, arg_str| arg_str.to_i},
     # For Errors, the first byte of the reply is "-"
-    "$" => lambda{|arg_str| arg_str.to_s},
+    "$" => lambda{|length, arg_str| length == -1 ? nil : arg_str.to_s},
     # For Arrays, the first byte of the reply is "*"
   }
 
@@ -44,11 +44,11 @@ class CommandLineBuilder
     args = []
     curr_idx = 3
     while curr_idx < tokens.length
-      type_char, _length_str = tokens[curr_idx][0], tokens[curr_idx][1...]
+      type_char, length = tokens[curr_idx][0], tokens[curr_idx][1...].to_i
       convertor = TOKEN_TYPE_COVERTERS[type_char]
       curr_idx += 1
 
-      args << convertor.call(tokens[curr_idx])
+      args << convertor.call(length, tokens[curr_idx])
       curr_idx += 1
     end
     
