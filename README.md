@@ -1,3 +1,9 @@
+## Remainings
+- TODO: Pass stage 7. Somehow, the second command (GET) in the connection takes 3 seconds at `socket.recv` 😮
+- TODO: Use concurrency instead of creating subprocesses to handle multipl connections.
+
+---
+
 [![progress-banner](https://app.codecrafters.io/progress/redis/93de33c1-a243-4def-9e53-d0be4e7e9280)](https://app.codecrafters.io/users/kudojp)
 
 This is a starting point for Ruby solutions to the
